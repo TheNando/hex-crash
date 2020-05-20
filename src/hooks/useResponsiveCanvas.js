@@ -4,6 +4,7 @@ function useResponsiveCanvas(initialSize) {
   const canvasRef = useRef()
   const mountRef = useRef()
   const [size, setSize] = useState(initialSize)
+  let resizeTimeoutId
 
   // set initial svg and size
   useEffect(() => {
@@ -22,10 +23,15 @@ function useResponsiveCanvas(initialSize) {
       if (!entries || !entries.length) {
         return
       }
-      if (initialSize === undefined) {
+
+      if (resizeTimeoutId) {
+        clearTimeout(resizeTimeoutId)
+      }
+
+      resizeTimeoutId = setTimeout(() => {
         let { width, height } = entries[0].contentRect
         setSize([width, height])
-      }
+      }, 250)
     })
     resizeObserver.observe(mount)
 
@@ -33,6 +39,7 @@ function useResponsiveCanvas(initialSize) {
     return () => {
       resizeObserver.unobserve(mount)
       mount.removeChild(canvas)
+      clearTimeout(resizeTimeoutId)
     }
   }, [initialSize])
 

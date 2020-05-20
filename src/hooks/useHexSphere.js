@@ -31,6 +31,10 @@ function isLand(lat, lon, img, pixelData) {
   return pixelData.data[(y * pixelData.width + x) * 4] === 0
 }
 
+function randInt(max) {
+  return Math.floor(Math.random() * max)
+}
+
 function constructScene(
   scene,
   img,
@@ -68,9 +72,9 @@ function constructScene(
     if (!isHex) {
       material = pentaMaterial
     } else if (isLand(latLon.lat, latLon.lon, img, pixelData)) {
-      material = meshMaterials[Math.floor(Math.random() * meshMaterials.length)]
+      material = meshMaterials[randInt(meshMaterials.length)]
     } else {
-      material = oceanMaterial[Math.floor(Math.random() * oceanMaterial.length)]
+      material = oceanMaterial[randInt(oceanMaterial.length)]
     }
 
     material.opacity = 0.75
@@ -181,6 +185,9 @@ const useHexSphere = function (canvas, mountRef, canvasSize, hexOptions) {
 
   useEffect(() => {
     const renderer = rendererRef.current
+    const camera = cameraRef.current
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
     renderer.setSize(width, height)
   }, [height, width])
 
