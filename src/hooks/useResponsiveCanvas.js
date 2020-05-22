@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 
+const MIN_ELAPSED = 33 // Milliseconds passed since last resize
+
 function useResponsiveCanvas(initialSize) {
   const canvasRef = useRef()
   const mountRef = useRef()
+  const lastResizeRef = useRef()
   const [size, setSize] = useState(initialSize)
   let resizeTimeoutId
 
@@ -10,6 +13,7 @@ function useResponsiveCanvas(initialSize) {
   useEffect(() => {
     const canvas = document.createElement('canvas')
     const mount = mountRef.current
+
     canvas.style.display = 'block'
     canvasRef.current = canvas
 
@@ -17,21 +21,22 @@ function useResponsiveCanvas(initialSize) {
     const [width, height] = initialSize
 
     setSize([width, height])
+    lastResizeRef.current = Date.now()
 
     // update resize using a resize observer
-    const resizeObserver = new ResizeObserver((entries) => {
+    const resizeObserver = new ResizeObserver(entries => {
+      // Prevent excessive resizes
+      if (Date.now() - lastResizeRef.current < MIN_ELAPSED) {
+        return
+      }
+
       if (!entries || !entries.length) {
         return
       }
 
-      if (resizeTimeoutId) {
-        clearTimeout(resizeTimeoutId)
-      }
-
-      resizeTimeoutId = setTimeout(() => {
-        let { width, height } = entries[0].contentRect
-        setSize([width, height])
-      }, 250)
+      let { width, height } = entries[0].contentRect
+      setSize([width, height])
+      lastResizeRef.current = Date.now()
     })
     resizeObserver.observe(mount)
 
