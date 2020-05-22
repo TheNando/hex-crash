@@ -22,8 +22,8 @@ const App = function ({ hexOptions, initialSize }) {
 
 App.defaultProps = {
   hexOptions: {
-    radius: 30,
-    divisions: 12,
+    radius: 25,
+    divisions: 10,
     tileSize: 1,
   },
   initialSize: [window.innerWidth, window.innerHeight],
