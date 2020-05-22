@@ -1,8 +1,32 @@
 import { MeshBasicMaterial } from 'three'
-import { randColorLow, sampleOne } from '../lib/random.js'
+import { randColorLow } from '../lib/random.js'
+
+export const meshMaterials = [
+  0x7cfc00,
+  0x397d02,
+  0x77ee00,
+  0x61b329,
+  0x83f52c,
+  0x83f52c,
+  0x4cbb17,
+  0x00ee00,
+  0x00aa11,
+].map(color => new MeshBasicMaterial({ color }))
+
+export const oceanMaterial = [0x0f2342, 0x0f1e38].map(
+  color => new MeshBasicMaterial({ color })
+)
+
+export const pentaMaterial = new MeshBasicMaterial({ color: 0xd2320f })
+
+export const randomMaterial = Array(6)
+  .fill(0)
+  .map(() => new MeshBasicMaterial({ color: randColorLow() }))
+
+// const hexMats = {}
 
 // import MAP_IMAGE from '../assets/images/equirectangle_projection.png'
-import MAP_IMAGE_COLOR from '../assets/images/colored_projection.png'
+// import MAP_IMAGE_COLOR from '../assets/images/colored_projection.png'
 
 // function isLand(lat, lon, img, pixelData) {
 //   const x = parseInt((img.width * (lon + 180)) / 360, 10)
@@ -40,39 +64,6 @@ import MAP_IMAGE_COLOR from '../assets/images/colored_projection.png'
 
 //   let pixelData = projectionContext.getImageData(0, 0, img.width, img.height)
 // }
-
-export const meshMaterials = [
-  0x7cfc00,
-  0x397d02,
-  0x77ee00,
-  0x61b329,
-  0x83f52c,
-  0x83f52c,
-  0x4cbb17,
-  0x00ee00,
-  0x00aa11,
-].map(color => new MeshBasicMaterial({ color, transparent: true }))
-
-export const oceanMaterial = [0x0f2342, 0x0f1e38].map(
-  color => new MeshBasicMaterial({ color, transparent: false })
-)
-
-export const pentaMaterial = new MeshBasicMaterial({
-  color: 0xd2320f,
-  transparent: false,
-})
-
-// const hexMats = {}
-
-export const randomMaterial = Array(6)
-  .fill(0)
-  .map(
-    () =>
-      new MeshBasicMaterial({
-        color: randColorLow(),
-        transparent: false,
-      })
-  )
 
 // function toClampedHex(num) {
 //   return Number(Math.floor(num / 32) * 32)
