@@ -6,7 +6,7 @@ import Globe, { GlobeMode } from './lib/Globe.js'
 import './index.css'
 
 const RADIUS = 25
-const DIVISIONS = 10
+const DIVISIONS = 15
 const TILE_SIZE = 1
 
 const WIDTH = window.innerWidth

@@ -27,6 +27,12 @@ class Globe {
   }
 
   async generateTiles() {
+    let imageData
+
+    if (this.mode !== GlobeMode.Random) {
+      imageData = await getMapImage(this.mode === GlobeMode.Monochome)
+    }
+
     for (let i = 0; i < this.tiles.length; i++) {
       const geometry = new THREE.Geometry()
       const t = this.tiles[i]
@@ -54,7 +60,6 @@ class Globe {
       } else if (this.mode === GlobeMode.Random) {
         material = sampleOne(randomMaterial)
       } else {
-        const imageData = await getMapImage(this.mode === GlobeMode.Monochome)
         material = await getMaterial(latLon, imageData)
       }
 
