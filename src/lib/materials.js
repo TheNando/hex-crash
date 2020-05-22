@@ -1,5 +1,16 @@
 import { MeshBasicMaterial } from 'three'
-import { randColorLow } from '../lib/random.js'
+import { randColorLow, sampleOne } from '../lib/random.js'
+
+import MAP_IMAGE_MONO from '../assets/images/equirectangle_projection.png'
+import MAP_IMAGE_COLOR from '../assets/images/colored_projection.png'
+
+const hexMats = {}
+
+function toClampedHex(num) {
+  return Number(Math.floor(num / 32) * 32)
+    .toString(16)
+    .padStart(2, '0')
+}
 
 export const meshMaterials = [
   0x7cfc00,
@@ -23,73 +34,43 @@ export const randomMaterial = Array(6)
   .fill(0)
   .map(() => new MeshBasicMaterial({ color: randColorLow() }))
 
-// const hexMats = {}
+export async function getMapImage(mono = false) {
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d')
 
-// import MAP_IMAGE from '../assets/images/equirectangle_projection.png'
-// import MAP_IMAGE_COLOR from '../assets/images/colored_projection.png'
+  const image = new Image()
+  image.src = mono ? MAP_IMAGE_MONO : MAP_IMAGE_COLOR
+  await image.decode()
 
-// function isLand(lat, lon, img, pixelData) {
-//   const x = parseInt((img.width * (lon + 180)) / 360, 10)
-//   const y = parseInt((img.height * (lat + 90)) / 180, 10)
+  canvas.width = image.width
+  canvas.height = image.height
+  context.drawImage(image, 0, 0, image.width, image.height)
+  canvas.remove()
 
-//   return pixelData.data[(y * pixelData.width + x) * 4] === 0
-// }
+  const pixelData = context.getImageData(0, 0, image.width, image.height)
+  return { image, pixelData, isMono: mono }
+}
 
-// const img = document.createElement('img')
-// img.src = MAP_IMAGE_COLOR // MAP_IMAGE
+export async function getMaterial({ lat, lon }, { image, isMono, pixelData }) {
+  const x = parseInt((image.width * (lon + 180)) / 360, 10)
+  const y = parseInt((image.height * (lat + 90)) / 180, 10)
 
-// img.onload = function () {
-//   const projectionCanvas = document.createElement('canvas')
-//   const projectionContext = projectionCanvas.getContext('2d')
+  if (isMono) {
+    const isLand = pixelData.data[(y * pixelData.width + x) * 4] === 0
+    return isLand ? sampleOne(meshMaterials) : sampleOne(oceanMaterial)
+  }
 
-//   projectionCanvas.width = img.width
-//   projectionCanvas.height = img.height
-//   projectionContext.drawImage(img, 0, 0, img.width, img.height)
-//   projectionCanvas.remove()
+  const last = (y * pixelData.width + x) * 4
+  const hex = pixelData.data
+    .slice(last - 4, last - 1)
+    .reduce((str, item) => str + toClampedHex(item), '0x')
 
-//   let pixelData = projectionContext.getImageData(0, 0, img.width, img.height)
-// }
-// const img = new Image()
-// img.src = MAP_IMAGE_COLOR
-// console.log(MAP_IMAGE_COLOR)
+  if (!hexMats[hex]) {
+    hexMats[hex] = new MeshBasicMaterial({
+      color: Number(hex),
+      transparent: false,
+    })
+  }
 
-// img.onload = function () {
-//   const projectionCanvas = document.createElement('canvas')
-//   const projectionContext = projectionCanvas.getContext('2d')
-
-//   projectionCanvas.width = img.width
-//   projectionCanvas.height = img.height
-//   projectionContext.drawImage(img, 0, 0, img.width, img.height)
-//   projectionCanvas.remove()
-
-//   let pixelData = projectionContext.getImageData(0, 0, img.width, img.height)
-// }
-
-// function toClampedHex(num) {
-//   return Number(Math.floor(num / 32) * 32)
-//     .toString(16)
-//     .padStart(2, '0')
-// }
-
-// function toHex(num) {
-//   return Number(num).toString(16).padStart(2, '0')
-// }
-
-// function getMaterial(lat, lon, img, pixelData) {
-//   const x = parseInt((img.width * (lon + 180)) / 360, 10)
-//   const y = parseInt((img.height * (lat + 90)) / 180, 10)
-
-//   const last = (y * pixelData.width + x) * 4
-//   const hex = pixelData.data
-//     .slice(last - 4, last - 1)
-//     .reduce((str, item) => str + toClampedHex(item), '0x')
-
-//   if (!hexMats[hex]) {
-//     hexMats[hex] = new MeshBasicMaterial({
-//       color: Number(hex),
-//       transparent: false,
-//     })
-//   }
-
-//   return hex === '0x000020' ? sampleOne(oceanMaterial) : hexMats[hex]
-// }
+  return hex === '0x000020' ? sampleOne(oceanMaterial) : hexMats[hex]
+}

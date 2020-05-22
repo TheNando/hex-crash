@@ -1,16 +1,32 @@
 import Hexasphere from 'hexasphere.js'
 import * as THREE from 'three'
 
-import { pentaMaterial, randomMaterial } from './materials.js'
+import {
+  getMapImage,
+  getMaterial,
+  pentaMaterial,
+  randomMaterial,
+} from './materials.js'
 import { sampleOne } from './random.js'
 
+export const GlobeMode = {
+  Random: Symbol(),
+  Monochome: Symbol(),
+  Earth: Symbol(),
+}
+
 class Globe {
-  constructor(radius, divisions, tileSize) {
+  constructor(radius, divisions, tileSize, mode = GlobeMode.Random) {
     const globe = new Hexasphere(radius, divisions, tileSize)
+    this.mode = mode
 
     Object.assign(this, globe)
     this.group = new THREE.Group()
 
+    this.generateTiles()
+  }
+
+  async generateTiles() {
     for (let i = 0; i < this.tiles.length; i++) {
       const geometry = new THREE.Geometry()
       const t = this.tiles[i]
@@ -30,28 +46,20 @@ class Globe {
         isHex = true
       }
 
-      // const latLon = t.getLatLon(this.radius)
-      // let material
+      let material
+      const latLon = t.getLatLon(this.radius)
 
-      // // Monochrome Blue Green
-      // if (!isHex) {
-      //   material = pentaMaterial
-      // } else if (isLand(latLon.lat, latLon.lon, img, pixelData)) {
-      //   material = sampleOne(meshMaterials)
-      // } else {
-      //   material = sampleOne(oceanMaterial)
-      // }
+      if (!isHex) {
+        material = pentaMaterial
+      } else if (this.mode === GlobeMode.Random) {
+        material = sampleOne(randomMaterial)
+      } else {
+        const imageData = await getMapImage(this.mode === GlobeMode.Monochome)
+        material = await getMaterial(latLon, imageData)
+      }
 
-      // // Clamped Colorized
-      // material = isHex
-      //   ? getMaterial(latLon.lat, latLon.lon, img, pixelData)
-      //   : pentaMaterial
+      const mesh = new THREE.Mesh(geometry, material)
 
-      // Random Colorized
-      const mesh = new THREE.Mesh(
-        geometry,
-        isHex ? sampleOne(randomMaterial) : pentaMaterial
-      )
       this.group.add(mesh)
       this.tiles[i].mesh = mesh
     }

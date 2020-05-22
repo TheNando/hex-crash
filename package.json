@@ -27,5 +27,8 @@
     "singleQuote": true,
     "tabWidth": 2,
     "useTabs": false
-  }
+  },
+  "browserslist": [
+    "last 3 Chrome version"
+  ]
 }

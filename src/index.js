@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-import Globe from './lib/Globe.js'
+import Globe, { GlobeMode } from './lib/Globe.js'
 
 import './index.css'
 
@@ -22,7 +22,7 @@ const controls = new OrbitControls(camera, renderer.domElement)
 const scene = new THREE.Scene()
 // const pointLight = new THREE.PointLight(0xffffff)
 
-const globe = new Globe(RADIUS, DIVISIONS, TILE_SIZE)
+const globe = new Globe(RADIUS, DIVISIONS, TILE_SIZE, GlobeMode.Earth)
 
 scene.fog = new THREE.Fog(0x000000, VIEW_ANGLE * 1.3, VIEW_ANGLE * 1.7)
 
