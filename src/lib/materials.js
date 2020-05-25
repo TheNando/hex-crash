@@ -1,4 +1,4 @@
-import { MeshBasicMaterial } from 'three'
+import { DoubleSide, MeshBasicMaterial } from 'three'
 import { randColorLow, sampleOne } from '../lib/random.js'
 
 import MAP_IMAGE_MONO from '../assets/images/equirectangle_projection.png'
@@ -28,11 +28,19 @@ export const oceanMaterial = [0x0f2342, 0x0f1e38].map(
   color => new MeshBasicMaterial({ color })
 )
 
-export const pentaMaterial = new MeshBasicMaterial({ color: 0xd2320f })
+export const pentaMaterial = new MeshBasicMaterial({
+  color: 0xd2320f,
+})
 
-export const randomMaterial = Array(6)
+export let randomMaterial = Array(6)
   .fill(0)
   .map(() => new MeshBasicMaterial({ color: randColorLow() }))
+
+export function refreshRandomMaterials() {
+  randomMaterial = Array(6)
+    .fill(0)
+    .map(() => new MeshBasicMaterial({ color: randColorLow() }))
+}
 
 export async function getMapImage(mono = false) {
   const canvas = document.createElement('canvas')

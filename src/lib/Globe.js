@@ -11,7 +11,7 @@ import { sampleOne } from './random.js'
 
 export const GlobeMode = {
   Random: Symbol(),
-  Monochome: Symbol(),
+  Monochrome: Symbol(),
   Earth: Symbol(),
 }
 
@@ -30,7 +30,7 @@ class Globe {
     let imageData
 
     if (this.mode !== GlobeMode.Random) {
-      imageData = await getMapImage(this.mode === GlobeMode.Monochome)
+      imageData = await getMapImage(this.mode === GlobeMode.Monochrome)
     }
 
     for (let i = 0; i < this.tiles.length; i++) {
@@ -53,14 +53,13 @@ class Globe {
       }
 
       let material
-      const latLon = t.getLatLon(this.radius)
 
       if (!isHex) {
         material = pentaMaterial
       } else if (this.mode === GlobeMode.Random) {
         material = sampleOne(randomMaterial)
       } else {
-        material = await getMaterial(latLon, imageData)
+        material = await getMaterial(t.getLatLon(this.radius), imageData)
       }
 
       const mesh = new THREE.Mesh(geometry, material)
