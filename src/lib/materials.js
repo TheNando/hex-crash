@@ -22,24 +22,27 @@ export const meshMaterials = [
   0x4cbb17,
   0x00ee00,
   0x00aa11,
-].map(color => new MeshBasicMaterial({ color }))
+].map(color => new MeshBasicMaterial({ color, side: DoubleSide }))
 
 export const oceanMaterial = [0x0f2342, 0x0f1e38].map(
-  color => new MeshBasicMaterial({ color })
+  color => new MeshBasicMaterial({ color, side: DoubleSide })
 )
 
 export const pentaMaterial = new MeshBasicMaterial({
   color: 0xd2320f,
+  side: DoubleSide,
 })
 
 export let randomMaterial = Array(6)
   .fill(0)
-  .map(() => new MeshBasicMaterial({ color: randColorLow() }))
+  .map(() => new MeshBasicMaterial({ color: randColorLow(), side: DoubleSide }))
 
 export function refreshRandomMaterials() {
   randomMaterial = Array(6)
     .fill(0)
-    .map(() => new MeshBasicMaterial({ color: randColorLow() }))
+    .map(
+      () => new MeshBasicMaterial({ color: randColorLow(), side: DoubleSide })
+    )
 }
 
 export async function getMapImage(mono = false) {
@@ -76,7 +79,7 @@ export async function getMaterial({ lat, lon }, { image, isMono, pixelData }) {
   if (!hexMats[hex]) {
     hexMats[hex] = new MeshBasicMaterial({
       color: Number(hex),
-      transparent: false,
+      side: DoubleSide,
     })
   }
 

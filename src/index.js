@@ -35,6 +35,10 @@ const scene = new THREE.Scene()
 // const pointLight = new THREE.PointLight(0xffffff)
 
 const knobs = {
+  radius: RADIUS,
+  divisions: DIVISIONS,
+  tileSize: TILE_SIZE,
+
   fogStart: 0.5,
   fogEnd: 3.5,
   viewAngle: VIEW_ANGLE,
@@ -44,6 +48,7 @@ const knobs = {
       alert('Change mode to random to use this')
     }
   },
+
   autoRotate: false,
   autoRotateSpeed: 2,
   enableDamping: true,
@@ -53,6 +58,12 @@ const knobs = {
 global.knobs = knobs
 
 const gui = new dat.GUI()
+
+const guiGlobe = gui.addFolder('Globe')
+const radiusController = guiGlobe.add(knobs, 'radius', 10, 40)
+const divisionsController = guiGlobe.add(knobs, 'divisions', 3, 50)
+const tileSizeController = guiGlobe.add(knobs, 'tileSize', 0.1, 1)
+guiGlobe.open()
 
 const guiRender = gui.addFolder('Render')
 
@@ -68,17 +79,24 @@ guiRender.open()
 const rerollController = guiRender.add(knobs, 'reroll')
 rerollController.name('Reroll Random')
 
-let globe = new Globe(RADIUS, DIVISIONS, TILE_SIZE, GlobeMode[knobs.mode])
+let globe = new Globe(
+  Math.floor(knobs.radius),
+  Math.floor(knobs.divisions),
+  knobs.tileSize,
+  GlobeMode[knobs.mode]
+)
 
 function makeGlobe() {
   scene.remove(globe.group)
   refreshRandomMaterials()
-  globe = new Globe(RADIUS, DIVISIONS, TILE_SIZE, GlobeMode[knobs.mode])
+  globe = new Globe(
+    Math.floor(knobs.radius),
+    Math.floor(knobs.divisions),
+    knobs.tileSize,
+    GlobeMode[knobs.mode]
+  )
   scene.add(globe.group)
 }
-
-modeController.onChange(makeGlobe)
-rerollController.onChange(makeGlobe)
 
 scene.fog = new THREE.Fog(
   0x000000,
@@ -92,6 +110,21 @@ guiControls.add(knobs, 'autoRotateSpeed', 0, 30)
 guiControls.add(knobs, 'enableDamping', false)
 guiControls.add(knobs, 'dampingFactor', 0.0, 1)
 guiControls.open()
+
+let timeoutId
+function debouncedMakeGlobe() {
+  if (timeoutId) {
+    clearTimeout(timeoutId)
+  }
+
+  timeoutId = setTimeout(() => makeGlobe(), 300)
+}
+
+radiusController.onChange(debouncedMakeGlobe)
+divisionsController.onChange(debouncedMakeGlobe)
+tileSizeController.onChange(debouncedMakeGlobe)
+modeController.onChange(makeGlobe)
+rerollController.onChange(makeGlobe)
 
 // pointLight.position.x = 50
 // pointLight.position.y = 50
