@@ -1,4 +1,4 @@
-import { DoubleSide, MeshBasicMaterial } from 'three'
+import { MeshStandardMaterial } from 'three'
 import { randColorLow, sampleOne } from '../lib/random.js'
 
 import MAP_IMAGE_MONO from '../assets/images/equirectangle_projection.png'
@@ -22,27 +22,22 @@ export const meshMaterials = [
   0x4cbb17,
   0x00ee00,
   0x00aa11,
-].map(color => new MeshBasicMaterial({ color, side: DoubleSide }))
+].map(color => new MeshStandardMaterial({ color }))
 
 export const oceanMaterial = [0x0f2342, 0x0f1e38].map(
-  color => new MeshBasicMaterial({ color, side: DoubleSide })
+  color => new MeshStandardMaterial({ color })
 )
 
-export const pentaMaterial = new MeshBasicMaterial({
-  color: 0xd2320f,
-  side: DoubleSide,
-})
+export const pentaMaterial = new MeshStandardMaterial({ color: 0xd2320f })
 
 export let randomMaterial = Array(6)
   .fill(0)
-  .map(() => new MeshBasicMaterial({ color: randColorLow(), side: DoubleSide }))
+  .map(() => new MeshStandardMaterial({ color: randColorLow() }))
 
 export function refreshRandomMaterials() {
   randomMaterial = Array(6)
     .fill(0)
-    .map(
-      () => new MeshBasicMaterial({ color: randColorLow(), side: DoubleSide })
-    )
+    .map(() => new MeshStandardMaterial({ color: randColorLow() }))
 }
 
 export async function getMapImage(mono = false) {
@@ -77,10 +72,7 @@ export async function getMaterial({ lat, lon }, { image, isMono, pixelData }) {
     .reduce((str, item) => str + toClampedHex(item), '0x')
 
   if (!hexMats[hex]) {
-    hexMats[hex] = new MeshBasicMaterial({
-      color: Number(hex),
-      side: DoubleSide,
-    })
+    hexMats[hex] = new MeshStandardMaterial({ color: Number(hex) })
   }
 
   return hex === '0x000020' ? sampleOne(oceanMaterial) : hexMats[hex]

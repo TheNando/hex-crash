@@ -62,6 +62,10 @@ class Globe {
         material = await getMaterial(t.getLatLon(this.radius), imageData)
       }
 
+      // Needed so custom geometry can show light
+      geometry.computeFaceNormals()
+      geometry.computeVertexNormals()
+
       const mesh = new THREE.Mesh(geometry, material)
 
       this.group.add(mesh)

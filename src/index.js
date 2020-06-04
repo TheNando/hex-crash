@@ -20,6 +20,16 @@ const FAR = 10000
 
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 const camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR)
+const mouse = new THREE.Vector2()
+const raycaster = new THREE.Raycaster()
+const intersects = []
+const lastHex = { object: null, material: null }
+const glowMaterial = new THREE.MeshStandardMaterial({
+  emissive: new THREE.Color(0xffd700),
+  emissiveIntensity: 0.8,
+})
+
+const ambientLight = new THREE.AmbientLight(0x404040, 4)
 
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enablePan = false
@@ -32,7 +42,6 @@ controls.mouseButtons = {
 }
 
 const scene = new THREE.Scene()
-// const pointLight = new THREE.PointLight(0xffffff)
 
 const knobs = {
   radius: RADIUS,
@@ -126,22 +135,55 @@ tileSizeController.onChange(debouncedMakeGlobe)
 modeController.onChange(makeGlobe)
 rerollController.onChange(makeGlobe)
 
-// pointLight.position.x = 50
-// pointLight.position.y = 50
-// pointLight.position.z = 150
-
 camera.position.set(0, 0, 80)
-// camera.lookAt(0, 0, 0)
 controls.update()
 
 scene.add(camera)
 scene.add(globe.group)
+scene.add(ambientLight)
 
 // Render scene
 renderer.setSize(WIDTH, HEIGHT)
 renderer.render(scene, camera)
 
 document.getElementById('container').append(renderer.domElement)
+
+function setMouse(event) {
+  var x, y
+
+  if (event.changedTouches) {
+    x = event.changedTouches[0].pageX
+    y = event.changedTouches[0].pageY
+  } else {
+    x = event.clientX
+    y = event.clientY
+  }
+
+  mouse.x = (x / window.innerWidth) * 2 - 1
+  mouse.y = -(y / window.innerHeight) * 2 + 1
+
+  checkIntersection()
+}
+
+function checkIntersection() {
+  raycaster.setFromCamera(mouse, camera)
+  raycaster.intersectObject(globe.group, true, intersects)
+
+  // Highlight intersected hex, if found
+  if (intersects.length && intersects[0].object !== lastHex.object) {
+    // Set last highlighted hex back to original color
+    if (lastHex.object) {
+      lastHex.object.material = lastHex.material
+    }
+
+    lastHex.object = intersects[0].object
+    lastHex.material = intersects[0].object.material
+
+    glowMaterial.color.set(lastHex.material.color)
+    intersects[0].object.material = glowMaterial
+  }
+  intersects.length = 0
+}
 
 function animate() {
   scene.fog.near = VIEW_ANGLE * knobs.fogStart
@@ -186,3 +228,5 @@ resizeObserver.observe(document.getElementById('container'))
 // resizeObserver.unobserve(mount)
 
 animate()
+
+window.addEventListener('mousemove', setMouse)
