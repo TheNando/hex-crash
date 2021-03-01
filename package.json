@@ -20,7 +20,7 @@
     "dat.gui": "^0.7.7",
     "hexasphere.js": "0.2.2",
     "prettier": "2.0.5",
-    "three": "0.116.1"
+    "three": "0.125.0"
   },
   "prettier": {
     "arrowParens": "avoid",
