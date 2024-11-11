@@ -14,22 +14,17 @@
   },
   "devDependencies": {
     "eslint": "6.0.1",
-    "parcel-bundler": "1.12.4"
+    "parcel-bundler": "^1.8.1"
   },
   "dependencies": {
     "dat.gui": "^0.7.7",
     "hexasphere.js": "0.2.2",
     "prettier": "2.0.5",
-    "three": "0.116.1"
+    "three": "^0.116.1"
   },
-  "prettier": {
-    "arrowParens": "avoid",
-    "semi": false,
-    "singleQuote": true,
-    "tabWidth": 2,
-    "useTabs": false
-  },
+  "prettier": {},
   "browserslist": [
-    "last 3 Chrome version"
+    "defaults and fully supports es6-module",
+    "maintained node versions"
   ]
 }
