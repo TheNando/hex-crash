@@ -23,3 +23,6 @@ include:
   - Left click and drag to rotate
   - Right click and drag to move (currently messes up rotation)
   - Mouse scroll in/out to zoom
+
+![image](https://github.com/user-attachments/assets/41e7edf4-4a80-4ea7-b034-bd3c065135cb)
+
